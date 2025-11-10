@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/header"
 import { Starfield } from "@/components/starfield"
 import { Footer } from "@/components/footer"
@@ -16,13 +17,11 @@ interface PageProps {
 }
 
 // Disable prerendering so network calls are executed at request time
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic"  
 
 // Helper function to get base URL
 function getBaseUrl() {
-  if (typeof window !== 'undefined') return '' // Browser should use relative path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // Vercel deployment
-  return `http://localhost:${process.env.PORT ?? 3000}` // Local development
+  return `http://localhost:3002` // Local development
 }
 
 export default async function BlockPage({ params }: PageProps) {
@@ -34,16 +33,16 @@ export default async function BlockPage({ params }: PageProps) {
 
   try {
     // Fetch block details from API
-    const blockResponse = await fetch(`${baseUrl}/api/blocks/${height}`, {
+    const blockResponse = await fetch(`${baseUrl}/blocks/${height}`, {
       cache: 'no-store'
     })
-    console.log('Block API response status:', blockResponse.status, blockResponse.ok);
+   // console.log('Block API response status:', blockResponse.status, blockResponse.ok);
 
     if (!blockResponse.ok) {
       if (blockResponse.status === 404) {
         // Try transaction fallback 
         try {
-          const txResponse = await fetch(`${baseUrl}/api/transactions/${height}`, {
+          const txResponse = await fetch(`${baseUrl}/transactions/${height}`, {
             cache: 'no-store'
           })
           if (txResponse.ok) {
@@ -74,7 +73,7 @@ export default async function BlockPage({ params }: PageProps) {
     
     if (block.txCount > 0) {
       try {
-        const txResponse = await fetch(`${baseUrl}/api/blocks/${height}/transactions?limit=20`, {
+        const txResponse = await fetch(`${baseUrl}/blocks/${height}/transactions?limit=20`, {
           cache: 'no-store'
         })
         if (txResponse.ok) {
@@ -299,7 +298,7 @@ export default async function BlockPage({ params }: PageProps) {
     
     // Try transaction fallback
     try {
-      const txResponse = await fetch(`${baseUrl}/api/transactions/${height}`, {
+      const txResponse = await fetch(`${baseUrl}/transactions/${height}`, {
         cache: 'no-store'
       })
       if (txResponse.ok) {

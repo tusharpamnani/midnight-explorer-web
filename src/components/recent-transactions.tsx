@@ -44,7 +44,7 @@ export function RecentTransactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('/api/transactions/recent', { cache: 'no-store' })
+        const res = await fetch('http://localhost:3002/transactions/recent')
         if (res.ok) {
           const data: RawTransaction[] = await res.json()
           // ✅ Normalize hash to string with 0x prefix

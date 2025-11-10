@@ -35,7 +35,7 @@ function HomePageContent() {
   const { data: blocksData } = useQuery({
     queryKey: ['recent-blocks'],
     queryFn: async () => {
-      const res = await fetch('/api/blocks/recent', {
+      const res = await fetch('http://localhost:3002/blocks/recent', {
         cache: 'no-store',
         next: { revalidate: 0 }
       })
@@ -71,6 +71,8 @@ function HomePageContent() {
 
           {/* Network Statistics */}
           <NetworkStats /> 
+          {/* Charts Section */}
+          <NetworkCharts /> 
 
           {/* Recent Activity Grid */}
           <div className="grid lg:grid-cols-2 gap-6">
@@ -78,9 +80,6 @@ function HomePageContent() {
             {/* ✅ FIXED: RecentTransactions doesn't need props - it fetches internally */}
             <RecentTransactions />
           </div>
-
-          {/* Charts Section */}
-          <NetworkCharts /> 
 
           {/* Validator Statistics */}
           <ValidatorStats /> 

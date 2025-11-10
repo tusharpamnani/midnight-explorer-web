@@ -16,16 +16,14 @@ interface PageProps {
 export const dynamic = "force-dynamic"
 
 function getBaseUrl() {
-  if (typeof window !== 'undefined') return ''
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 3000}`
+  return `http://localhost:3002`;
 }
 
 export default async function TransactionPage({ params }: PageProps) {
   const resolvedParams = await params
   const baseUrl = getBaseUrl()
 
-  const res = await fetch(`${baseUrl}/api/transactions/${resolvedParams.hash}`, { 
+  const res = await fetch(`${baseUrl}/transactions/${resolvedParams.hash}`, { 
     cache: 'no-store' 
   })
 

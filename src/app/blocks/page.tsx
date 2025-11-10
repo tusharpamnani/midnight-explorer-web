@@ -33,9 +33,7 @@ interface PageProps {
 
 // Helper function to get base URL
 function getBaseUrl() {
-  if (typeof window !== 'undefined') return '' // Browser should use relative path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // Vercel deployment
-  return `http://localhost:${process.env.PORT ?? 3000}` // Local development
+  return `http://localhost:3002` // Local development
 }
 
 export default async function BlocksPage({ searchParams }: PageProps) {
@@ -45,7 +43,7 @@ export default async function BlocksPage({ searchParams }: PageProps) {
   const baseUrl = getBaseUrl()
 
   // Fetch blocks from API
-  const url = cursor ? `${baseUrl}/api/blocks?cursor=${cursor}` : `${baseUrl}/api/blocks`
+  const url = cursor ? `${baseUrl}/blocks?cursor=${cursor}` : `${baseUrl}/blocks`
   const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch blocks')
   

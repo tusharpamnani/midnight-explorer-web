@@ -30,9 +30,7 @@ interface PageProps {
 }
 
 function getBaseUrl() {
-  if (typeof window !== 'undefined') return ''
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 3000}`
+  return `http://localhost:3002` 
 }
 
 export default async function ContractsPage({ searchParams }: PageProps) {
@@ -43,11 +41,11 @@ export default async function ContractsPage({ searchParams }: PageProps) {
 
   // Fetch contracts from API
   const url = cursor 
-    ? `${baseUrl}/api/contracts?cursor=${cursor}` 
-    : `${baseUrl}/api/contracts`
-  
+    ? `${baseUrl}/contract/?cursor=${cursor}` 
+    : `${baseUrl}/contract/`
+
   const res = await fetch(url, { cache: 'no-store' })
-  if (!res.ok) throw new Error('Failed to fetch contracts')
+  if (!res.ok) throw new Error('Failed to fetch contracts') 
   
   const { items: contracts, nextCursor }: ApiResponse = await res.json()
 
@@ -56,7 +54,7 @@ export default async function ContractsPage({ searchParams }: PageProps) {
     contracts.map(async (contract: Contract): Promise<Contract> => {
       try {
         const txRes = await fetch(
-          `${baseUrl}/api/transactions/id/${contract.transactionId}`,
+          `${baseUrl}/transactions/id/${contract.transactionId}`,
           { cache: 'no-store' }
         )
         if (txRes.ok) {
