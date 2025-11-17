@@ -35,10 +35,11 @@ function HomePageContent() {
   const { data: blocksData } = useQuery({
     queryKey: ['recent-blocks'],
     queryFn: async () => {
-      const res = await fetch('/api/blocks/recent', {
-        cache: 'no-store',
-        next: { revalidate: 0 }
-      })
+      const res = await fetch('https://preview-service.midnightexplorer.com/blocks/recent', {
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+      }
+    })
       if (!res.ok) throw new Error('Failed to fetch blocks')
       const data = await res.json()
       return data.blocks || []
@@ -71,6 +72,8 @@ function HomePageContent() {
 
           {/* Network Statistics */}
           <NetworkStats /> 
+          {/* Charts Section */}
+          <NetworkCharts /> 
 
           {/* Recent Activity Grid */}
           <div className="grid lg:grid-cols-2 gap-6">
@@ -78,9 +81,6 @@ function HomePageContent() {
             {/* ✅ FIXED: RecentTransactions doesn't need props - it fetches internally */}
             <RecentTransactions />
           </div>
-
-          {/* Charts Section */}
-          <NetworkCharts /> 
 
           {/* Validator Statistics */}
           <ValidatorStats /> 

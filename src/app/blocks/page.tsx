@@ -31,22 +31,19 @@ interface PageProps {
   }>
 }
 
-// Helper function to get base URL
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return '' // Browser should use relative path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // Vercel deployment
-  return `http://localhost:${process.env.PORT ?? 3000}` // Local development
-}
 
 export default async function BlocksPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const cursor = resolvedSearchParams?.cursor
 
-  const baseUrl = getBaseUrl()
-
   // Fetch blocks from API
-  const url = cursor ? `${baseUrl}/api/blocks?cursor=${cursor}` : `${baseUrl}/api/blocks`
-  const res = await fetch(url, { cache: 'no-store' })
+  const url = cursor ? `https://preview-service.midnightexplorer.com/blocks?cursor=${cursor}` : `https://preview-service.midnightexplorer.com/blocks`
+  const res = await fetch(url, 
+    {
+    headers: {
+      'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+    }
+  })
   if (!res.ok) throw new Error('Failed to fetch blocks')
   
   const { items: blocks, nextCursor }: ApiResponse = await res.json()

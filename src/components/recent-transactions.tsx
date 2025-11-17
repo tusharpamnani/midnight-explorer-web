@@ -44,7 +44,11 @@ export function RecentTransactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('/api/transactions/recent', { cache: 'no-store' })
+        const res = await fetch('https://preview-service.midnightexplorer.com/transactions/recent', {
+        headers: {
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+        }
+      })
         if (res.ok) {
           const data: RawTransaction[] = await res.json()
           // ✅ Normalize hash to string with 0x prefix

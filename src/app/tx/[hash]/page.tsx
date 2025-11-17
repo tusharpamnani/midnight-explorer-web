@@ -16,19 +16,17 @@ interface PageProps {
 export const dynamic = "force-dynamic"
 
 function getBaseUrl() {
-  if (typeof window !== 'undefined') return ''
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 3000}`
+  return `http://localhost:3002`;
 }
 
 export default async function TransactionPage({ params }: PageProps) {
   const resolvedParams = await params
   const baseUrl = getBaseUrl()
-
-  const res = await fetch(`${baseUrl}/api/transactions/${resolvedParams.hash}`, { 
-    cache: 'no-store' 
-  })
-
+  const res = await fetch(`https://preview-service.midnightexplorer.com/transactions/${resolvedParams.hash}`, {
+        headers: {
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+        }
+      })
   if (!res.ok) {
     if (res.status === 404) {
       notFound()

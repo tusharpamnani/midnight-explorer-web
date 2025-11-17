@@ -39,22 +39,17 @@ interface PageProps {
   searchParams: Promise<{ cursor?: string }>
 }
 
-// Helper function to get base URL
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return '' // Browser should use relative path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // Vercel deployment
-  return `http://localhost:${process.env.PORT ?? 3000}` // Local development
-}
 
 export default async function TransactionsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const cursor = resolvedSearchParams?.cursor
-
-  const baseUrl = getBaseUrl()
-
   // Fetch transactions from API
-  const url = cursor ? `${baseUrl}/api/transactions?cursor=${cursor}` : `${baseUrl}/api/transactions`
-  const res = await fetch(url, { cache: 'no-store' })
+  const url = cursor ? `https://preview-service.midnightexplorer.com/transactions?cursor=${cursor}` : `https://preview-service.midnightexplorer.com/transactions`
+  const res = await fetch(url, {
+    headers: {
+      'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+    }
+  })
   if (!res.ok) throw new Error('Failed to fetch transactions')
   
   const { items: transactions, nextCursor }: ApiResponse = await res.json()
@@ -69,7 +64,7 @@ export default async function TransactionsPage({ searchParams }: PageProps) {
         return (
           <Badge className="bg-green-500/10 text-green-400 border-green-500/20 hover:bg-green-500/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
-            Success
+            Success 
           </Badge>
         )
       case "pending":
@@ -147,7 +142,7 @@ export default async function TransactionsPage({ searchParams }: PageProps) {
                           href={`/tx/${tx.hash}`}
                           className="text-blue-400 hover:text-blue-300 transition-colors font-mono text-sm"
                         >
-                          {tx.hash.slice(0, 16)}...{tx.hash.slice(-16)}
+                          {tx.hash}
                         </Link>
                       </td>
                       <td className="p-4">{getStatusBadge(tx.status)}</td>

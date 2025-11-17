@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/header"
 import { Starfield } from "@/components/starfield"
 import { Footer } from "@/components/footer"
@@ -16,35 +17,33 @@ interface PageProps {
 }
 
 // Disable prerendering so network calls are executed at request time
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic"  
 
-// Helper function to get base URL
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return '' // Browser should use relative path
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // Vercel deployment
-  return `http://localhost:${process.env.PORT ?? 3000}` // Local development
-}
 
 export default async function BlockPage({ params }: PageProps) {
   // AWAIT params first
   const { height } = await params;
   console.log('Fetching block with height/hash:', height);
 
-  const baseUrl = getBaseUrl();
-
   try {
     // Fetch block details from API
-    const blockResponse = await fetch(`${baseUrl}/api/blocks/${height}`, {
-      cache: 'no-store'
+    const blockResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${height}`, {
+      cache: 'no-store',
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+      }
     })
-    console.log('Block API response status:', blockResponse.status, blockResponse.ok);
+   // console.log('Block API response status:', blockResponse.status, blockResponse.ok);
 
     if (!blockResponse.ok) {
       if (blockResponse.status === 404) {
         // Try transaction fallback 
         try {
-          const txResponse = await fetch(`${baseUrl}/api/transactions/${height}`, {
-            cache: 'no-store'
+          const txResponse = await fetch(`https://preview-service.midnightexplorer.com/transactions/${height}`, {
+            cache: 'no-store',
+            headers: {
+              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+            }
           })
           if (txResponse.ok) {
             redirect(`/tx/${height}`)
@@ -74,8 +73,11 @@ export default async function BlockPage({ params }: PageProps) {
     
     if (block.txCount > 0) {
       try {
-        const txResponse = await fetch(`${baseUrl}/api/blocks/${height}/transactions?limit=20`, {
-          cache: 'no-store'
+        const txResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${height}/transactions?limit=20`, {
+          cache: 'no-store',
+          headers: {
+            'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+          }
         })
         if (txResponse.ok) {
           const txData = await txResponse.json()
@@ -299,8 +301,11 @@ export default async function BlockPage({ params }: PageProps) {
     
     // Try transaction fallback
     try {
-      const txResponse = await fetch(`${baseUrl}/api/transactions/${height}`, {
-        cache: 'no-store'
+      const txResponse = await fetch(`https://preview-service.midnightexplorer.com/transactions/${height}`, {
+        cache: 'no-store',
+        headers: {
+          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+        }
       })
       if (txResponse.ok) {
         redirect(`/tx/${height}`)

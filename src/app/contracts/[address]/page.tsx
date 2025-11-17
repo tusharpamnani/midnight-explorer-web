@@ -15,19 +15,15 @@ interface PageProps {
 
 export const dynamic = "force-dynamic"
 
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return ''
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 3000}`
-}
 
 export default async function ContractPage({ params }: PageProps) {
   const { address } = await params
-  const baseUrl = getBaseUrl()
-
   try {
-    const res = await fetch(`${baseUrl}/api/contracts/${address}`, {
-      cache: 'no-store'
+    const res = await fetch(`https://preview-service.midnightexplorer.com/contract/${address}`, {
+      cache: 'no-store',
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
+      }
     })
 
     if (!res.ok) {
@@ -42,8 +38,8 @@ export default async function ContractPage({ params }: PageProps) {
     if (contract.transactionId) {
       try {
         const txRes = await fetch(
-          `${baseUrl}/api/transactions/id/${contract.transactionId}`,
-          { cache: 'no-store' }
+          `https://preview-service.midnightexplorer.com/transactions/id/${contract.transactionId}`,
+          { cache: 'no-store', headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '' } }
         )
         if (txRes.ok) {
           const txData = await txRes.json()
