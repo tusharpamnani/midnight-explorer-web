@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { useEffect, useState } from "react"
+import { networkAPI } from "@/lib/api"
 
 // 🔹 Dữ liệu mẫu tạm thời (trước khi bạn kết nối API backend)
 const dummyData = [
@@ -23,14 +24,7 @@ export function NetworkCharts() {
   useEffect(() => {
     const fetchTransactionData = async () => {
       try {
-        const res = await fetch('https://preview-service.midnightexplorer.com/network/stats', {
-        headers: {
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-        }
-      })
-        if (!res.ok) throw new Error("Failed to fetch transaction stats")
-
-        const stats = await res.json()
+        const stats = await networkAPI.getStats<{ recent24h: number }>()
         const now = new Date()
         const hours = Array.from({ length: 7 }, (_, i) => {
           const h = (i * 4) % 24

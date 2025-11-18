@@ -15,6 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { formatDistanceToNow } from "@/lib/utils"
+import { transactionAPI } from "@/lib/api"
 
 // Disable prerendering so network calls are executed at request time
 export const dynamic = "force-dynamic"
@@ -43,16 +44,9 @@ interface PageProps {
 export default async function TransactionsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const cursor = resolvedSearchParams?.cursor
-  // Fetch transactions from API
-  const url = cursor ? `https://preview-service.midnightexplorer.com/transactions?cursor=${cursor}` : `https://preview-service.midnightexplorer.com/transactions`
-  const res = await fetch(url, {
-    headers: {
-      'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-    }
-  })
-  if (!res.ok) throw new Error('Failed to fetch transactions')
   
-  const { items: transactions, nextCursor }: ApiResponse = await res.json()
+  // Fetch transactions from API
+  const { items: transactions, nextCursor }: ApiResponse = await transactionAPI.getTransactions(cursor)
 
   // Pagination helpers - use transaction IDs instead of offsets
   const prevCursor = transactions.length > 0 ? transactions[0].id : null

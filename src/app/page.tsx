@@ -12,6 +12,7 @@ import { ValidatorStats } from "@/components/validator-stats"
 import { TokenStats } from "@/components/token-stats"
 import { NetworkHealth } from "@/components/network-health"
 import { Starfield } from "@/components/starfield"
+import { blockAPI } from "@/lib/api"
 
 interface Block {
   height: number
@@ -35,13 +36,7 @@ function HomePageContent() {
   const { data: blocksData } = useQuery({
     queryKey: ['recent-blocks'],
     queryFn: async () => {
-      const res = await fetch('https://preview-service.midnightexplorer.com/blocks/recent', {
-      headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-      }
-    })
-      if (!res.ok) throw new Error('Failed to fetch blocks')
-      const data = await res.json()
+      const data = await blockAPI.getRecentBlocks<{ blocks: Block[] }>()
       return data.blocks || []
     },
     refetchInterval: 30000,

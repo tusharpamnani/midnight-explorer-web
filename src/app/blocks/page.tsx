@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Search, ChevronLeft, ChevronRight, Box, Clock } from "lucide-react"
 import Link from "next/link"
 import { formatDistanceToNow } from "@/lib/utils"
+import { blockAPI } from "@/lib/api"
 
 // Disable prerendering so network calls are done at request time
 export const dynamic = "force-dynamic"
@@ -37,16 +38,7 @@ export default async function BlocksPage({ searchParams }: PageProps) {
   const cursor = resolvedSearchParams?.cursor
 
   // Fetch blocks from API
-  const url = cursor ? `https://preview-service.midnightexplorer.com/blocks?cursor=${cursor}` : `https://preview-service.midnightexplorer.com/blocks`
-  const res = await fetch(url, 
-    {
-    headers: {
-      'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-    }
-  })
-  if (!res.ok) throw new Error('Failed to fetch blocks')
-  
-  const { items: blocks, nextCursor }: ApiResponse = await res.json()
+  const { items: blocks, nextCursor }: ApiResponse = await blockAPI.getBlocks(cursor)
 
   // Pagination helpers
   const limit = 20
