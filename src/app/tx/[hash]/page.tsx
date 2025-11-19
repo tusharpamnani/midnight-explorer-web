@@ -7,7 +7,9 @@ import { CopyButton } from "@/components/ui/copy-button"
 import { CheckCircle2, Clock, AlertCircle, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { formatDistanceToNow } from "@/lib/utils"
+import { transactionAPI } from "@/lib/api"
 import { notFound } from "next/navigation"
+import { Transaction } from "@/lib/types"
 
 interface PageProps {
   params: Promise<{ hash: string }>
@@ -21,20 +23,14 @@ function getBaseUrl() {
 
 export default async function TransactionPage({ params }: PageProps) {
   const resolvedParams = await params
-  const baseUrl = getBaseUrl()
-  const res = await fetch(`https://preview-service.midnightexplorer.com/transactions/${resolvedParams.hash}`, {
-        headers: {
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-        }
-      })
-  if (!res.ok) {
-    if (res.status === 404) {
-      notFound()
-    }
-    throw new Error('Failed to fetch transaction')
+  
+  let transaction: Transaction
+  try {
+    transaction = await transactionAPI.getTransaction<Transaction>(resolvedParams.hash)
+  } catch (_error) {
+    notFound()
   }
-
-  const transaction = await res.json()
+  
   console.log('Fetched transaction:', transaction)
 
   const getStatusBadge = (status: string) => {

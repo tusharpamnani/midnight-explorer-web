@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, ArrowLeft, Clock, CheckCircle2, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { formatDistanceToNow } from "@/lib/utils"
+import { blockAPI, transactionAPI } from "@/lib/api"
 import { notFound, redirect } from "next/navigation"
 import { CopyButton } from "@/components/ui/copy-button"
 import { Transaction } from "@/lib/types"
@@ -27,36 +28,7 @@ export default async function BlockPage({ params }: PageProps) {
 
   try {
     // Fetch block details from API
-    const blockResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${height}`, {
-      cache: 'no-store',
-      headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-      }
-    })
-   // console.log('Block API response status:', blockResponse.status, blockResponse.ok);
-
-    if (!blockResponse.ok) {
-      if (blockResponse.status === 404) {
-        // Try transaction fallback 
-        try {
-          const txResponse = await fetch(`https://preview-service.midnightexplorer.com/transactions/${height}`, {
-            cache: 'no-store',
-            headers: {
-              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-            }
-          })
-          if (txResponse.ok) {
-            redirect(`/tx/${height}`)
-          }
-        } catch (error) {
-          notFound()
-        }
-        notFound()
-      }
-      throw new Error('Failed to fetch block')
-    }
-
-    const data = await blockResponse.json()
+    const data = await blockAPI.getBlock<{ block: { height: number; hash: string; timestamp: string | number; txCount: number } }>(height)
     console.log('Block data received:', data);
     
     if (!data.block) {
@@ -73,17 +45,9 @@ export default async function BlockPage({ params }: PageProps) {
     
     if (block.txCount > 0) {
       try {
-        const txResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${height}/transactions?limit=20`, {
-          cache: 'no-store',
-          headers: {
-            'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-          }
-        })
-        if (txResponse.ok) {
-          const txData = await txResponse.json()
-          transactions = txData.transactions || []
-          hasMoreTransactions = block.txCount > 20
-        }
+        const txData = await blockAPI.getBlockTransactions<{ transactions: Transaction[] }>(height, { limit: 20 })
+        transactions = txData.transactions || []
+        hasMoreTransactions = block.txCount > 20
       } catch (error) {
         console.error('Error fetching transactions:', error)
       }
@@ -301,19 +265,10 @@ export default async function BlockPage({ params }: PageProps) {
     
     // Try transaction fallback
     try {
-      const txResponse = await fetch(`https://preview-service.midnightexplorer.com/transactions/${height}`, {
-        cache: 'no-store',
-        headers: {
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-        }
-      })
-      if (txResponse.ok) {
-        redirect(`/tx/${height}`)
-      }
-    } catch (txError) {
+      await transactionAPI.getTransaction(height)
+      redirect(`/tx/${height}`)
+    } catch (_txError) {
       notFound()
     }
-    
-    notFound()
   }
 }

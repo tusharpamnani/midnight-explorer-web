@@ -8,6 +8,8 @@ import { ArrowLeft, FileCode, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CopyButton } from "@/components/ui/copy-button"
+import { contractAPI, transactionAPI } from "@/lib/api"
+import { Contract } from "@/lib/types"
 
 interface PageProps {
   params: Promise<{ address: string }>
@@ -18,39 +20,27 @@ export const dynamic = "force-dynamic"
 
 export default async function ContractPage({ params }: PageProps) {
   const { address } = await params
+  
+  let contract: Contract
   try {
-    const res = await fetch(`https://preview-service.midnightexplorer.com/contract/${address}`, {
-      cache: 'no-store',
-      headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-      }
-    })
+    const data = await contractAPI.getContract<{ contract: Contract }>(address)
+    contract = data.contract
+  } catch (_error) {
+    notFound()
+  }
 
-    if (!res.ok) {
-      if (res.status === 404) notFound()
-      throw new Error('Failed to fetch contract')
+  // Fetch transaction hash from ID
+  let transactionHash = null
+  if (contract.transactionId) {
+    try {
+      const txData = await transactionAPI.getTransactionById<{ hash: string }>(contract.transactionId)
+      transactionHash = txData.hash
+    } catch (error) {
+      console.error('Failed to fetch transaction hash:', error)
     }
+  }
 
-    const { contract } = await res.json()
-
-    // ✅ NEW: Fetch transaction hash from ID
-    let transactionHash = null
-    if (contract.transactionId) {
-      try {
-        const txRes = await fetch(
-          `https://preview-service.midnightexplorer.com/transactions/id/${contract.transactionId}`,
-          { cache: 'no-store', headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '' } }
-        )
-        if (txRes.ok) {
-          const txData = await txRes.json()
-          transactionHash = txData.hash
-        }
-      } catch (error) {
-        console.error('Failed to fetch transaction hash:', error)
-      }
-    }
-
-    return (
+  return (
       <div className="min-h-screen bg-background relative">
         <div className="fixed inset-0 z-0">
           <Starfield />
@@ -176,9 +166,5 @@ export default async function ContractPage({ params }: PageProps) {
           <Footer />
         </div>
       </div>
-    )
-  } catch (error) {
-    console.error('Error fetching contract:', error)
-    notFound()
-  }
+  )
 }

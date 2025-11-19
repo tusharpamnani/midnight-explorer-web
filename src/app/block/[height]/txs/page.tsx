@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, Clock, AlertCircle, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react"
 import { formatDistanceToNow } from "@/lib/utils"
+import { blockAPI } from "@/lib/api"
 import { notFound } from "next/navigation"
 
 // Disable prerendering so network calls are executed at request time
@@ -41,20 +42,23 @@ export default async function BlockTransactionsPage({ params, searchParams }: Pa
   const cursor = resolvedSearchParams.cursor || '0'
 
   // Fetch block
-  const blockResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${resolvedParams.height}`, { cache: 'no-store', headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '' } })
-  if (!blockResponse.ok) {
-    notFound()
-  }
-  const { block }: { block: Block } = await blockResponse.json()
-
-  // Fetch transactions
+  let block: Block
   let transactions: Transaction[] = []
   let nextCursor: string | null = null
-  const txResponse = await fetch(`https://preview-service.midnightexplorer.com/blocks/${resolvedParams.height}/transactions?limit=20&offset=${cursor}`, { cache: 'no-store', headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '' } })
-  if (txResponse.ok) {
-    const txData: { transactions: Transaction[], nextCursor?: string } = await txResponse.json()
+  
+  try {
+    const blockData: { block: Block } = await blockAPI.getBlock(resolvedParams.height)
+    block = blockData.block
+
+    // Fetch transactions
+    const txData: { transactions: Transaction[], nextCursor?: string } = await blockAPI.getBlockTransactions(
+      resolvedParams.height, 
+      { limit: 20, offset: cursor }
+    )
     transactions = txData.transactions
     nextCursor = txData.nextCursor || null
+  } catch (_error) {
+    notFound()
   }
 
   // Pagination helpers

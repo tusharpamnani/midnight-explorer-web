@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, FileCode, ExternalLink } from "lucide-react"
 import Link from "next/link"
+import { contractAPI, transactionAPI } from "@/lib/api"
 
 export const dynamic = "force-dynamic"
 
@@ -33,38 +34,17 @@ interface PageProps {
 export default async function ContractsPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams
   const cursor = resolvedSearchParams?.cursor
+  
   // Fetch contracts from API
-  const url = cursor
-    ? `https://preview-service.midnightexplorer.com/contract/?cursor=${cursor}`
-    : `https://preview-service.midnightexplorer.com/contract/`
-
-  const res = await fetch(url, {
-    headers: {
-      'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-    }
-  })
-  if (!res.ok) throw new Error('Failed to fetch contracts')
-
-  const { items: contracts, nextCursor }: ApiResponse = await res.json()
+  const { items: contracts, nextCursor }: ApiResponse = await contractAPI.getContracts<ApiResponse>(cursor)
 
   // ✅ NEW: Fetch transaction hashes for all contracts
   const contractsWithHashes = await Promise.all(
     contracts.map(async (contract: Contract): Promise<Contract> => {
       try {
-        const txRes = await fetch(
-          `https://preview-service.midnightexplorer.com/transactions/id/${contract.transactionId}`,
-          {
-            headers: {
-              'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-            }
-          }
-        )
-        if (txRes.ok) {
-          const txData = await txRes.json()
-          return { ...contract, transactionHash: txData.hash }
-        }
+        const txData = await transactionAPI.getTransactionById<{ hash: string }>(contract.transactionId)
+        return { ...contract, transactionHash: txData.hash }
       } catch (error) {
-        // ✅ FIXED: Use error parameter or prefix with underscore
         console.error(`Failed to fetch hash for TX ${contract.transactionId}:`, error)
       }
       return contract

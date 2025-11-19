@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Activity, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { formatDistanceToNow } from '@/lib/utils'
+import { transactionAPI } from '@/lib/api'
 
 interface BufferData {
   type: 'Buffer'
@@ -44,43 +45,36 @@ export function RecentTransactions() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await fetch('https://preview-service.midnightexplorer.com/transactions/recent', {
-        headers: {
-          'x-api-key': process.env.NEXT_PUBLIC_API_KEY || ''
-        }
-      })
-        if (res.ok) {
-          const data: RawTransaction[] = await res.json()
-          // ✅ Normalize hash to string with 0x prefix
-          const normalizedData: Transaction[] = data.map((tx) => {
-            let hashStr: string = ''
-            
-            if (typeof tx.hash === 'string') {
-              hashStr = tx.hash.startsWith('0x') ? tx.hash : `0x${tx.hash}`
-            } else if (tx.hash && typeof tx.hash === 'object' && 'data' in tx.hash && Array.isArray((tx.hash as BufferData).data)) {
-              hashStr = '0x' + Buffer.from((tx.hash as BufferData).data).toString('hex')
-            }
+        const data: RawTransaction[] = await transactionAPI.getRecentTransactions<RawTransaction[]>()
+        // ✅ Normalize hash to string with 0x prefix
+        const normalizedData: Transaction[] = data.map((tx) => {
+          let hashStr: string = ''
+          
+          if (typeof tx.hash === 'string') {
+            hashStr = tx.hash.startsWith('0x') ? tx.hash : `0x${tx.hash}`
+          } else if (tx.hash && typeof tx.hash === 'object' && 'data' in tx.hash && Array.isArray((tx.hash as BufferData).data)) {
+            hashStr = '0x' + Buffer.from((tx.hash as BufferData).data).toString('hex')
+          }
 
-            // ✅ Normalize status to known values
-            let statusStr = String(tx.status || tx.apply_stage || '').toLowerCase()
-            if (statusStr.includes('fail')) statusStr = 'failed'
-            else if (statusStr.includes('succ')) statusStr = 'success'
-            else if (statusStr.includes('pend')) statusStr = 'pending'
-            else statusStr = statusStr || 'pending'
+          // ✅ Normalize status to known values
+          let statusStr = String(tx.status || tx.apply_stage || '').toLowerCase()
+          if (statusStr.includes('fail')) statusStr = 'failed'
+          else if (statusStr.includes('succ')) statusStr = 'success'
+          else if (statusStr.includes('pend')) statusStr = 'pending'
+          else statusStr = statusStr || 'pending'
 
-            return {
-              id: tx.id || '',
-              hash: hashStr,
-              status: statusStr,
-              blockHeight: tx.blockHeight,
-              blockId: tx.blockId,
-              timestamp: tx.timestamp ? Number(tx.timestamp) : undefined,
-              protocolVersion: tx.protocolVersion ? Number(tx.protocolVersion) : undefined,
-              size: tx.size ? Number(tx.size) : undefined,
-            }
-          })
-          setTxs(normalizedData)
-        }
+          return {
+            id: tx.id || '',
+            hash: hashStr,
+            status: statusStr,
+            blockHeight: tx.blockHeight,
+            blockId: tx.blockId,
+            timestamp: tx.timestamp ? Number(tx.timestamp) : undefined,
+            protocolVersion: tx.protocolVersion ? Number(tx.protocolVersion) : undefined,
+            size: tx.size ? Number(tx.size) : undefined,
+          }
+        })
+        setTxs(normalizedData)
       } catch (error) {
         console.error('Error fetching recent transactions:', error)
       } finally {
