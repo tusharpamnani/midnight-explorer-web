@@ -7,6 +7,7 @@ import "./globals.css"
 import { Suspense } from "react"
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { LoadingFallback } from "@/components/loading-fallback"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.midnightexplorer.com'),
@@ -56,7 +57,7 @@ export default function RootLayout({
           `font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`
         )}
       >
-        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+        <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
         <Analytics />
       </body>
       <GoogleAnalytics gaId="G-QT1M3GG0MM" />
