@@ -7,7 +7,6 @@ import "./globals.css"
 import { Suspense } from "react"
 import { cn } from "@/lib/utils";
 import { GoogleAnalytics } from '@next/third-parties/google'
-import { NetworkStatusBanner } from "@/components/network-status-banner"
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.midnightexplorer.com'),
@@ -57,7 +56,6 @@ export default function RootLayout({
           `font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`
         )}
       >
-        <NetworkStatusBanner />
         <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
         <Analytics />
       </body>
