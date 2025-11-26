@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const API_BASE_URL = process.env.API_URL || 'https://preview-service.midnightexplorer.com'
 const API_KEY = process.env.API_KEY || ''
-
 /**
  * Proxy a request to the external API
  */

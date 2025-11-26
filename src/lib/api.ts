@@ -165,7 +165,27 @@ export const networkAPI = {
   getStats: <T = unknown>() =>
     apiFetch<T>('/network/stats')
 }
+/**
+ * Pool API methods
+ */
+export const poolAPI = {
+  /**
+   * Get all pools with pagination
+   */
+  getPools: <T = unknown>(page?: string, pageSize?: string) => {
+    const params = new URLSearchParams()
+    if (page) params.append('page', page)
+    if (pageSize) params.append('pageSize', pageSize)
+    const query = params.toString()
+    return apiFetch<T>(`/pool${query ? `?${query}` : ''}`)
+  },
 
+  /**
+   * Get a specific pool by ID
+   */
+  getPool: <T = unknown>(id: string) =>
+    apiFetch<T>(`/pool/${id}`)
+}
 /**
  * Export getApiHeaders for direct use
  */
