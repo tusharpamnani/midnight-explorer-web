@@ -58,7 +58,7 @@ export function Header() {
               Contracts
             </Link>
             <Link 
-              href="/" 
+              href="/pool" 
               className="text-sm font-medium transition-colors hover:text-primary"
             >
               Pool

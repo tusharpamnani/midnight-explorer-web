@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { CopyButton } from "@/components/ui/copy-button"
 import { Activity, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow } from '@/lib/utils'
+import { formatDateTimeWithRelative } from '@/lib/utils'
 import { transactionAPI } from '@/lib/api'
 
 interface BufferData {
@@ -126,7 +126,7 @@ export function RecentTransactions() {
                   )}
                   {tx.timestamp && (
                     <span className="text-sm text-muted-foreground">
-                      {formatDistanceToNow(new Date(tx.timestamp))} ago
+                      {formatDateTimeWithRelative(new Date(tx.timestamp))}
                     </span>
                   )}
                 </div>

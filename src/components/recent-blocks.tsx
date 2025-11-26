@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { CopyButton } from "@/components/ui/copy-button"
 import { Blocks, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { formatDistanceToNow } from '@/lib/utils'
+import { formatDateTimeWithRelative } from '@/lib/utils'
 
 interface Block {
   height: number
@@ -44,7 +44,7 @@ export function RecentBlocks({ blocks }: RecentBlocksProps) {
                 #{block.height}
               </Badge>
               <span className="text-sm text-muted-foreground">
-                {formatDistanceToNow(new Date(block.timestamp))} ago
+                {formatDateTimeWithRelative(new Date(block.timestamp))}
               </span>
             </div>
 
