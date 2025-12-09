@@ -13,7 +13,7 @@ interface TokenPriceData {
 let sharedData: TokenPriceData | null = null
 let sharedLoading = true
 let fetchInterval: NodeJS.Timeout | null = null
-let subscribers: Set<(data: TokenPriceData | null, loading: boolean) => void> = new Set()
+const subscribers: Set<(data: TokenPriceData | null, loading: boolean) => void> = new Set()
 
 async function fetchPrice() {
   try {
