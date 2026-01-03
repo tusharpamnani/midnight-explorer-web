@@ -10,7 +10,6 @@ const REFRESH_INTERVAL = 90000 // 90 seconds (refresh every 1.5 minutes)
 
 let refreshTimer: NodeJS.Timeout | null = null
 let isRefreshing = false
-let initialTokenFetched = false
 
 /**
  * Start automatic token refresh
@@ -35,9 +34,7 @@ export function startTokenRefresh() {
 async function refreshTokenSync() {
   const success = await refreshToken()
   
-  if (success) {
-    initialTokenFetched = true
-  } else {
+  if (!success) {
     // Retry after 2 seconds if failed
     setTimeout(refreshTokenSync, 2000)
   }
@@ -74,9 +71,9 @@ async function refreshToken(): Promise<boolean> {
       return false
     }
     
-    const data = await response.json()
+    await response.json()
     return true
-  } catch (error) {
+  } catch {
     return false
   } finally {
     isRefreshing = false

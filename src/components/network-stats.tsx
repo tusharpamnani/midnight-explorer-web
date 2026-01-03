@@ -8,12 +8,6 @@ import { useEffect, useState } from "react"
 export function NetworkStats() {
   const { sidechainStatus, latestBlock, totalTransactions, loading, error } = useNetworkStats()
   const [timeUntilEpoch, setTimeUntilEpoch] = useState<string>('')
-  const [mounted, setMounted] = useState(false)
-
-  // Prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   // Calculate time until next epoch
   useEffect(() => {
