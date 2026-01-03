@@ -19,10 +19,6 @@ export async function fetchServerToken(): Promise<string | null> {
         'Content-Type': 'application/json',
         'accept': 'application/json',
       },
-      body: JSON.stringify({
-        'User-Agent': 'NextJS-SSR',
-        'Accept-Language': 'en-US',
-      }),
       cache: 'no-store',
     })
 

@@ -173,11 +173,11 @@ export function SearchBar() {
                 // Check if it looks like a tx/block/contract hash (64 chars)
                 if (isHexHash(cleanQuery)) {
                     // Check all types in parallel: TX first, then Contract, then Block, then Pool
-                    const [txResult, contractResult, blockResult, poolResult] = await Promise.all([
+                    const [txResult, poolResult, blockResult, contractResult] = await Promise.all([
                         checkTransaction(cleanQuery),
-                        checkContract(cleanQuery),
+                        searchPool(cleanQuery),
                         checkBlock(cleanQuery),
-                        searchPool(cleanQuery)
+                        checkContract(cleanQuery)
                     ])
 
                     // Check TRANSACTION first
@@ -203,17 +203,7 @@ export function SearchBar() {
                         }
                     }
 
-                    // Check CONTRACT second
-                    if (contractResult.found && contractResult.data) {
-                        results.push({ type: RESULT_TYPE_CONTRACT, contract: contractResult.data })
-                    }
-
-                    // Check BLOCK third
-                    if (blockResult.found && blockResult.data) {
-                        results.push({ type: RESULT_TYPE_BLOCK, block: blockResult.data })
-                    }
-
-                    // Check POOL fourth
+                    // Check POOL second
                     if (poolResult.found && poolResult.results) {
                         // Show up to 5 pools in dropdown
                         const displayPools = poolResult
@@ -222,6 +212,16 @@ export function SearchBar() {
                         displayPools.forEach(pool => {
                             results.push({ type: RESULT_TYPE_POOL, pool })
                         })
+                    }
+
+                    // Check BLOCK third
+                    if (blockResult.found && blockResult.data) {
+                        results.push({ type: RESULT_TYPE_BLOCK, block: blockResult.data })
+                    }
+
+                    // Check CONTRACT fourth
+                    if (contractResult.found && contractResult.data) {
+                        results.push({ type: RESULT_TYPE_CONTRACT, contract: contractResult.data })
                     }
 
                     if (results.length > 0) {
