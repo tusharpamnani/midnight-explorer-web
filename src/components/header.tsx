@@ -58,12 +58,12 @@ export function Header() {
             >
               Transactions
             </Link>
-            {/* <Link
+            <Link
               href="/contracts"
               className="text-sm font-medium transition-colors hover:text-primary"
             >
               Contracts
-            </Link> */}
+            </Link>
             {/* <Link
               href="/pool"
               className="text-sm font-medium transition-colors hover:text-primary"

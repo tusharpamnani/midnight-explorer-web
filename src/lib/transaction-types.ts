@@ -13,29 +13,46 @@ export interface RegularTransaction {
   startIndex: number
   paidFees: string
   estimatedFees: string
+  identifiers?: string[]
+}
+
+export interface MerklePathNode {
+  goes_left: boolean
+  sibling_hash: number[]
+}
+
+export interface GenerationInfo {
+  ctime: number
+  dtime: number
+  nonce: string
+  owner: string
+  value: number
+  night_utxo_hash: string
+}
+
+export interface DustGenerationDtimeUpdate {
+  merkle_path: MerklePathNode[]
+  generation_info: GenerationInfo
+  generation_index: number
+}
+
+export interface DustInitialUtxo {
+  output: {
+    seq: number
+    ctime: number
+    nonce: string
+    owner: string
+    mt_index: number
+    backing_night: string
+    initial_value: number
+  }
+  generation_info: GenerationInfo
+  generation_index: number
 }
 
 export interface LedgerEventAttribute {
-  DustInitialUtxo?: {
-    output: {
-      seq: number
-      ctime: number
-      nonce: string
-      owner: string
-      mt_index: number
-      backing_night: string
-      initial_value: number
-    }
-    generation_info: {
-      ctime: number
-      dtime: number
-      nonce: string
-      owner: string
-      value: number
-      night_utxo_hash: string
-    }
-    generation_index: number
-  }
+  DustInitialUtxo?: DustInitialUtxo
+  DustGenerationDtimeUpdate?: DustGenerationDtimeUpdate
 }
 
 export interface LedgerEvent {
@@ -51,6 +68,24 @@ export interface UnshieldedUtxo {
   value?: string
   registeredForDustGeneration?: boolean
 }
+
+export interface ContractCall {
+  address: string
+  function: string
+  args?: unknown[]
+  result?: unknown
+}
+
+export interface ContractDeploy {
+  address: string
+  bytecode?: string
+  constructor?: unknown
+  result?: unknown
+}
+
+export type ContractAction = 
+  | { variant: 'Call'; data: ContractCall }
+  | { variant: 'Deploy'; data: ContractDeploy }
 
 /**
  * Raw transaction from API response
@@ -68,6 +103,7 @@ export interface RawTransaction {
   regularTransaction?: RegularTransaction
   ledgerEvents?: LedgerEvent
   unshieldedUtxos?: UnshieldedUtxo
+  contractActions?: ContractAction[] | null
 }
 
 /**
@@ -112,3 +148,4 @@ export interface Block {
 export interface BlockResponse {
   block: Block
 }
+ 
