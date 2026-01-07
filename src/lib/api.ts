@@ -179,6 +179,14 @@ export const transactionAPI = {
     apiFetch<T>(`/transactions/${hash}`),
 
   /**
+   * Verify if a transaction exists by hash (fast verification)
+   * Returns found status, type, txHash, and txId
+   * More efficient than full search for existence checks
+   */
+  verifyTransaction: <T = unknown>(hash: string) =>
+    apiFetch<T>(`/transactions/verify?hash=${encodeURIComponent(hash)}`),
+
+  /**
    * Search transactions by hash (partial or full)
    * Returns list with basic info and pagination
    * Used for search functionality
