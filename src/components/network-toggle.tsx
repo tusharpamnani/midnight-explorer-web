@@ -24,9 +24,9 @@ function getNetworkFromDomain(): NetworkType {
     }
   }
   
-  // Default for localhost and other domains. eg:
+  // Default for localhost and other unknown domains
   // - localhost:8080 -> PREPROD
-  // - midnightexplorer.com -> MAINNET (but current is PREPROD)
+  // - midnightexplorer.com -> PREPROD (configured in domains)
   return NetworkType.PREPROD
 }
 

@@ -16,7 +16,6 @@ export const NETWORKS = {
     label: "Preview",
     domain: "preview.midnightexplorer.com",
     domains: [
-      "midnightexplorer.com",
       "preview.midnightexplorer.com",
       "preview.dev.midnightexplorer.com",
       "preview.test.midnightexplorer.com",
@@ -43,6 +42,7 @@ export const NETWORKS = {
     label: "Preprod",
     domain: "preprod.midnightexplorer.com",
     domains: [
+      "midnightexplorer.com",
       "preprod.midnightexplorer.com",
       "preprod.dev.midnightexplorer.com",
       "preprod.test.midnightexplorer.com",
