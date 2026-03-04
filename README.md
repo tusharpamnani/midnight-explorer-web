@@ -130,5 +130,6 @@ docker network connect midnight-net midnight-explorer-web-test
 
 ## 📄 License
 
-Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+Copyright (c) 2026 TexLabs - texlabs.org
 
+Licensed under the [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
